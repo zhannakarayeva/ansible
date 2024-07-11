@@ -1,0 +1,31 @@
+---
+- name: Copy text.sh file and replace 'julia' with 'yulia'
+  hosts: ubuntu-linux  # Use the correct inventory group name
+  remote_user: ubuntu
+  become: yes  # Ensure privilege escalation is enabled if needed
+
+  tasks:
+    - name: Create text.sh file with content
+      copy:
+        content: |
+          #!/bin/bash
+          echo "tuncay sergey paul algreim nogar" > /tmp/text.txt
+          echo "diana julia" >> /tmp/text.txt
+        dest: /tmp/text.sh
+        mode: '0755'
+
+    - name: Copy text.sh file to /tmp folder
+      copy:
+        src: /tmp/text.sh
+        dest: /tmp/text.sh
+        mode: '0755'
+        remote_src: yes
+      notify: replace_julia  # Trigger the handler when the file is copied
+      become: true  # Ensure privilege escalation is used for copying
+
+  handlers:
+    - name: replace_julia
+      replace:
+        path: /tmp/text.txt
+        regexp: 'julia'
+        replace: 'yulia'

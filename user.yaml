@@ -1,0 +1,25 @@
+---
+- name: Manage users and groups
+  hosts: ubuntu
+  remote_user: ubuntu
+  become: yes
+  tasks:
+    - name: Ensure group 'devs' exists
+      ansible.builtin.group:
+        name: devs
+        state: present
+
+    - name: Ensure user 'don' exists and is in 'devs' group
+      ansible.builtin.user:
+        name: don
+        groups: devs
+        append: yes
+        state: present
+
+    - name: Ensure user 'jake' exists, is in 'devs' group, and has a specific shell
+      ansible.builtin.user:
+        name: jake
+        groups: devs
+        append: yes
+        shell: /bin/bash
+        state: present

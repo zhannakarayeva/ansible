@@ -1,0 +1,44 @@
+# Install web-servers , sql,  nodejs packages bot for ubuntu and amazon linux  using loop and make sure they are started
+---
+- hosts: all  # Replace 'all' with your target hosts or group
+  remote_user: ec2-user  # Replace with your remote user
+  become: yes  # Enable privilege escalation
+
+  tasks:
+    - name: Install web server, SQL, and Node.js packages
+      vars:
+        ubuntu_packages:
+          - apache2
+          - mariadb-server
+          - nodejs
+        amazon_linux_packages:
+          - httpd
+          - mariadb-server
+          - nodejs
+
+      # Use package manager based on OS type
+      # Install packages using loop
+      - name: Install packages on Ubuntu
+        apt:
+          name: "{{ item }}"
+          state: present
+        loop: "{{ ubuntu_packages }}"
+        when: ansible_distribution == 'Ubuntu'
+
+      - name: Install packages on Amazon Linux
+        yum:
+          name: "{{ item }}"
+          state: present
+        loop: "{{ amazon_linux_packages }}"
+        when: ansible_distribution == 'Amazon'
+
+    - name: Ensure services are started and enabled
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - apache2    # Replace with httpd for Amazon Linux
+        - mariadb
+        - nodejs
+
